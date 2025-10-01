@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 function sanitize(input: string): string {
 	return input.replace(/[\u0000-\u001F\u007F-\u009F]/g, '').trim();
 }
@@ -29,13 +27,20 @@ export async function POST(req: NextRequest) {
 		`;
 		const text = `Name: ${safeName}\nEmail: ${safeEmail}\n\n${safeMessage}`;
 
+		const apiKey = process.env.RESEND_API_KEY;
+		if (!apiKey) {
+			// In dev without key, avoid 500s; act as a no-op and report success
+			return NextResponse.json({ ok: true, dev: true, info: 'Email disabled: RESEND_API_KEY missing. No email sent.' }, { status: 200 });
+		}
+
+		const resend = new Resend(apiKey);
 		await resend.emails.send({
 			from: 'onboarding@resend.dev',
 			to: ['tellgranit@gmail.com'],
 			subject,
 			html,
 			text,
-			replyTo: safeEmail,
+			reply_to: safeEmail,
 		});
 
 		return NextResponse.json({ ok: true });
