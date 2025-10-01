@@ -817,7 +817,7 @@ export function InvestmentAnalystPortfolioDashboard() {
               </a>
             </div>
           </div>
-          <div className="mt-6" style={{ height: "600px", position: "relative" }}>
+          <div className="mt-6 mobile-gallery-frame" style={{ height: "600px", position: "relative" }}>
             {(() => {
               const galleryItems = Array.from({ length: 20 }, (_, i) => ({
                 image: `/gallery/${i + 1}.jpg`,

@@ -24,6 +24,16 @@ function autoBind(instance: any): void {
   });
 }
 
+function isWebGLSupported(): boolean {
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
+    return !!gl;
+  } catch {
+    return false;
+  }
+}
+
 function getFontSize(font: string): number {
   const match = font.match(/(\d+)px/);
   return match ? parseInt(match[1], 10) : 30;
@@ -441,28 +451,61 @@ class App {
     this.addEventListeners();
   }
 
+  private showFallback() {
+    // Minimal, non-intrusive fallback: hide the canvas container but keep layout
+    this.container.classList.add('webgl-fallback');
+    this.container.innerHTML = '';
+  }
+
   createRenderer() {
-    this.renderer = new Renderer({
-      alpha: true,
-      antialias: true,
-      dpr: Math.min(window.devicePixelRatio || 1, 2)
-    });
-    this.gl = this.renderer.gl;
-    this.gl.clearColor(0, 0, 0, 0);
-    this.container.appendChild(this.renderer.gl.canvas as HTMLCanvasElement);
+    // Check support before attempting creation
+    if (!isWebGLSupported()) {
+      console.warn('[CircularGallery] WebGL not supported, disabling.');
+      this.showFallback();
+      return;
+    }
+    try {
+      this.renderer = new Renderer({
+        alpha: true,
+        antialias: true,
+        dpr: Math.min(window.devicePixelRatio || 1, 2)
+      });
+      this.gl = this.renderer.gl;
+      this.gl.clearColor(0, 0, 0, 0);
+      this.container.appendChild(this.renderer.gl.canvas as HTMLCanvasElement);
+    } catch (error) {
+      console.warn('[CircularGallery] Failed to create WebGL renderer:', error);
+      // Attempt a reduced-quality retry
+      try {
+        this.renderer = new Renderer({
+          alpha: true,
+          antialias: false,
+          dpr: 1
+        });
+        this.gl = this.renderer.gl;
+        this.gl.clearColor(0, 0, 0, 0);
+        this.container.appendChild(this.renderer.gl.canvas as HTMLCanvasElement);
+      } catch (err2) {
+        console.warn('[CircularGallery] Renderer retry failed:', err2);
+        this.showFallback();
+      }
+    }
   }
 
   createCamera() {
+    if (!this.gl) return;
     this.camera = new Camera(this.gl);
     this.camera.fov = 45;
     this.camera.position.z = 20;
   }
 
   createScene() {
+    if (!this.gl) return;
     this.scene = new Transform();
   }
 
   createGeometry() {
+    if (!this.gl) return;
     this.planeGeometry = new Plane(this.gl, {
       heightSegments: 50,
       widthSegments: 100
@@ -666,17 +709,25 @@ export default function CircularGallery({
   const containerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!containerRef.current) return;
-    const app = new App(containerRef.current, {
-      items,
-      bend,
-      textColor,
-      borderRadius,
-      font,
-      scrollSpeed,
-      scrollEase
-    });
+    let app: any = null;
+    try {
+      app = new App(containerRef.current, {
+        items,
+        bend,
+        textColor,
+        borderRadius,
+        font,
+        scrollSpeed,
+        scrollEase
+      });
+    } catch (err) {
+      console.warn('[CircularGallery] disabled due to error:', err);
+      app = null;
+    }
     return () => {
-      app.destroy();
+      try {
+        app?.destroy?.();
+      } catch {}
     };
   }, [items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase]);
   return <div className="w-full h-full overflow-hidden cursor-grab active:cursor-grabbing" ref={containerRef} />;

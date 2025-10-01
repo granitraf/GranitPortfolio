@@ -314,4 +314,85 @@ body {
 	.glow-green {
 		text-shadow: 0 0 6px rgba(52, 211, 153, 0.55), 0 0 14px rgba(52, 211, 153, 0.35);
 	}
+
+	/* Mobile-only adjustments: prevent big headings from scrunching/cropping */
+	@media (max-width: 640px) {
+		/* Prevent horizontal drift on mobile */
+		html, body {
+			overflow-x: hidden;
+		}
+		/* Contain wide/angled containers from creating horizontal scroll */
+		.mobile-gallery-frame,
+		.marketbrief-video-container {
+			max-width: 100%;
+			overflow: hidden;
+			touch-action: pan-y;
+			overscroll-behavior-x: none;
+		}
+		/* Reduce only very large headings; keep words intact */
+		h1.font-heading.text-6xl,
+		h2.font-heading.text-6xl {
+			font-size: clamp(1.75rem, 6.5vw, 2.75rem);
+			line-height: 1.08;
+			word-break: normal;
+			overflow-wrap: break-word;
+			white-space: normal;
+		}
+		/* Specific class for extra-long heading */
+		.mobile-long-title {
+			font-size: clamp(1.875rem, 6.875vw, 2.8125rem) !important;
+			line-height: 1.05 !important;
+			letter-spacing: 0.01em;
+		}
+		/* Headings that include a logo: allow wrap and scale logo */
+		h1.font-heading span.inline-flex,
+		h2.font-heading span.inline-flex {
+			flex-wrap: wrap;
+			gap: 0.5rem;
+		}
+		h1.font-heading img,
+		h2.font-heading img {
+			height: 1.4rem;
+			width: auto;
+			object-fit: contain;
+		}
+	}
+}
+
+/* Mobile title standardization – unify all section titles */
+@media (max-width: 768px) {
+	/* Apply to all main titles in the app */
+	h1.font-heading,
+	h2.font-heading,
+	.section-title,
+	.main-title {
+		font-size: clamp(1.6rem, 5.4vw, 2.1rem) !important; /* fits the longest title on small phones */
+		font-weight: 700 !important;
+		line-height: 1.2 !important;
+		margin: 1rem 0 !important;
+		letter-spacing: 0.01em;
+		max-width: 100%;
+		word-break: normal;
+		overflow-wrap: break-word;
+		hyphens: auto;
+		white-space: normal;
+	}
+	/* Extra small phones (≤375px) tighten slightly */
+	@media (max-width: 375px) {
+		h1.font-heading,
+		h2.font-heading,
+		.section-title,
+		.main-title {
+			font-size: clamp(1.45rem, 5.2vw, 1.9rem) !important;
+			line-height: 1.16 !important;
+		}
+	}
+	/* Ensure heading logos (MarketBrief/AlertIndex) scale to text, not distort */
+	h1.font-heading img,
+	h2.font-heading img {
+		height: 1.2em; /* follow text size */
+		width: auto;
+		object-fit: contain;
+		vertical-align: baseline;
+	}
 }
