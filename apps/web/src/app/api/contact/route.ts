@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 			subject,
 			html,
 			text,
-			reply_to: safeEmail,
+			replyTo: safeEmail,
 		});
 
 		return NextResponse.json({ ok: true });
