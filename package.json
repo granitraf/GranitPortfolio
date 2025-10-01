@@ -13,5 +13,8 @@
 		"dev:web": "bun run --filter web dev",
 		"dev:server": "bun run --filter server dev"
 	},
-	"packageManager": "bun@1.2.21"
+	"packageManager": "bun@1.2.21",
+	"dependencies": {
+		"ogl": "^1.0.11"
+	}
 }
