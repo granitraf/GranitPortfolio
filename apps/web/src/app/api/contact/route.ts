@@ -18,13 +18,7 @@ export async function POST(req: NextRequest) {
 
 		const subject = `New Contact Form Submission from ${safeName}`;
 		const html = `
-		  <div style="font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif; line-height: 1.5;">
-		    <p><strong>Name:</strong> ${safeName}</p>
-		    <p><strong>Email:</strong> ${safeEmail}</p>
-		    <p><strong>Message:</strong></p>
-		    <div style="white-space: pre-wrap;">${safeMessage}</div>
-		  </div>
-		`;
+		  <div style=\"font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif; line-height: 1.5;\">\n\t\t    <p><strong>Name:</strong> ${safeName}</p>\n\t\t    <p><strong>Email:</strong> ${safeEmail}</p>\n\t\t    <p><strong>Message:</strong></p>\n\t\t    <div style=\"white-space: pre-wrap;\">${safeMessage}</div>\n\t\t  </div>\n\t\t`;
 		const text = `Name: ${safeName}\nEmail: ${safeEmail}\n\n${safeMessage}`;
 
 		const apiKey = process.env.RESEND_API_KEY;
@@ -40,7 +34,7 @@ export async function POST(req: NextRequest) {
 			subject,
 			html,
 			text,
-			reply_to: safeEmail,
+			replyTo: safeEmail,
 		});
 
 		return NextResponse.json({ ok: true });
