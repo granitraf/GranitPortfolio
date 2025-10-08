@@ -475,7 +475,7 @@ export function InvestmentAnalystPortfolioDashboard() {
                 </div>
               <div className="flex items-start gap-2 text-base text-muted-foreground">
                 <Icon icon="mdi:dots-horizontal" className="h-6 w-6 text-primary mt-0.5" />
-                <span>Working towards CSC Level I</span>
+                <span>Working towards CFA Level I</span>
               </div>
               </div>
             <div className="space-y-2.5">
